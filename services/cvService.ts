@@ -1,24 +1,23 @@
-
 export const downloadCV = async () => {
   // The jspdf CDN script puts the library in window.jspdf
   const jspdfNamespace = (window as any).jspdf;
   
   if (!jspdfNamespace) {
-    console.error("jsPDF library not found in window object");
-    alert("The PDF generator is still loading or failed to load. Please check your internet connection.");
+    console.error("jsPDF library not found in window object. Check CDN script in index.html");
+    alert("The PDF generator is still loading. Please wait a moment and try again.");
     return;
   }
 
-  // In some versions it's window.jspdf.jsPDF, in others just window.jspdf
-  const jsPDF = jspdfNamespace.jsPDF || jspdfNamespace;
+  // The constructor is usually at window.jspdf.jsPDF
+  const jsPDFConstructor = jspdfNamespace.jsPDF;
   
-  if (typeof jsPDF !== 'function') {
-    console.error("jsPDF is not a constructor", jsPDF);
-    alert("PDF generation error. Please try again later.");
+  if (!jsPDFConstructor) {
+    console.error("jsPDF constructor not found in namespace", jspdfNamespace);
+    alert("PDF generation error. Please contact me directly for a CV.");
     return;
   }
 
-  const doc = new jsPDF({
+  const doc = new jsPDFConstructor({
     orientation: 'portrait',
     unit: 'mm',
     format: 'a4'
@@ -48,7 +47,7 @@ export const downloadCV = async () => {
   doc.text('Email: jcruspero3263@gmail.com', margin, y);
   y += 10;
 
-  // Add a line
+  // Horizontal Line
   doc.setDrawColor(226, 232, 240);
   doc.line(margin, y, pageWidth - margin, y);
   y += 10;
@@ -68,14 +67,14 @@ export const downloadCV = async () => {
   doc.text(summaryLines, margin, y);
   y += (summaryLines.length * 5) + 10;
 
-  // Experience Header
+  // Experience
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
   doc.setTextColor(37, 99, 235);
   doc.text('PROFESSIONAL EXPERIENCE', margin, y);
   y += 7;
 
-  // Experience 1
+  // Job 1
   doc.setFontSize(11);
   doc.setTextColor(15, 23, 42);
   doc.text('Six Eleven Global Services', margin, y);
