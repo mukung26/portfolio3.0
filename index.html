@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Portfolio Version: 1.0.3 - Adding PDF Link -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -51,7 +52,6 @@
         .success-checkmark { width: 64px; height: 64px; margin: 0 auto; background: #dcfce7; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #16a34a; font-size: 32px; }
         .dark .success-checkmark { background: #064e3b; color: #4ade80; }
     </style>
-<link rel="stylesheet" href="/index.css">
 </head>
 <body class="bg-slate-50 text-slate-900 bg-pattern transition-colors duration-300">
     <div id="root"></div>
@@ -59,7 +59,7 @@
     <script type="text/babel">
       const { useState, useEffect } = React;
 
-      // --- CV Service (Standard Icons for PDF compatibility) ---
+      // --- CV Service ---
       const downloadCV = async () => {
         try {
           const { jsPDF } = window.jspdf;
@@ -89,6 +89,13 @@
           pdf.setTextColor(100, 100, 100);
           const contactInfo = 'Davao City, Philippines  |  Phone: +63 991 474 0695  |  Email: jcruspero3263@gmail.com';
           pdf.text(contactInfo, margin, y);
+          y += 5;
+
+          // Portfolio Link in PDF
+          const portfolioUrl = 'https://mukung26.github.io/portfolio3.0/';
+          pdf.setTextColor(11, 95, 255);
+          pdf.text('Portfolio: ' + portfolioUrl, margin, y);
+          pdf.link(margin, y - 3, pdf.getTextWidth('Portfolio: ' + portfolioUrl), 4, { url: portfolioUrl });
           y += 6;
 
           // Horizontal Divider
@@ -141,14 +148,14 @@
           pdf.text('PROFESSIONAL EXPERIENCE', margin, y);
           y += 6;
 
-          // Experience 1 - Updated with new content
+          // Experience 1
           addCVExperience(pdf, 'Six Eleven Global Services', 'CSR / RTA \u2014 Davao | 03/2024 \u2013 01/2026', [
             'Train new CSRs on order processing, credit handling, and escalation procedures; recognized as top performer with high QA scores.',
             'Primary contact for order entry and email inquiries; process customer orders while meeting SLAs.',
             'Support AP readiness: input invoices and credit notes, prepare data for vendor reconciliation.',
             'Prepare spreadsheets using formulas and pivot tables for month-end checks and GL allocations.'
           ], margin, y);
-          y += 36; // Increased space for extra bullet
+          y += 36;
 
           // Experience 2
           addCVExperience(pdf, 'Tempestas ESports', 'Administrative Support \u2014 Davao | 12/2020 \u2013 12/2022', [
@@ -252,7 +259,7 @@
                 <input required type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="you@example.com" className="w-full px-5 py-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:border-blue-600 transition-all shadow-sm" />
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Phone Number</label>
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Phone Number (optional)</label>
                 <input type="tel" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} placeholder="+63 XXX XXX XXXX" className="w-full px-5 py-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:border-blue-600 transition-all shadow-sm" />
               </div>
               <div>
@@ -487,6 +494,5 @@
       const root = ReactDOM.createRoot(document.getElementById('root'));
       root.render(<App />);
     </script>
-<script type="module" src="/index.tsx"></script>
 </body>
 </html>
