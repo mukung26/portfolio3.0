@@ -3,17 +3,17 @@ export const downloadCV = async () => {
   const jspdfNamespace = (window as any).jspdf;
   
   if (!jspdfNamespace) {
-    console.error("jsPDF library not found in window object. Check CDN script in index.html");
-    alert("The PDF generator is still loading. Please wait a moment and try again.");
+    console.error("jsPDF library not found in window object.");
+    alert("The PDF generator is still loading. Please wait a few seconds and try again.");
     return;
   }
 
-  // The constructor is usually at window.jspdf.jsPDF
-  const jsPDFConstructor = jspdfNamespace.jsPDF;
+  // Handle both possible structures: window.jspdf.jsPDF or window.jspdf (if it is the constructor itself)
+  const jsPDFConstructor = jspdfNamespace.jsPDF || jspdfNamespace;
   
-  if (!jsPDFConstructor) {
+  if (typeof jsPDFConstructor !== 'function') {
     console.error("jsPDF constructor not found in namespace", jspdfNamespace);
-    alert("PDF generation error. Please contact me directly for a CV.");
+    alert("PDF generation error. Please try again later.");
     return;
   }
 
@@ -67,7 +67,7 @@ export const downloadCV = async () => {
   doc.text(summaryLines, margin, y);
   y += (summaryLines.length * 5) + 10;
 
-  // Experience
+  // Experience Header
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
   doc.setTextColor(37, 99, 235);

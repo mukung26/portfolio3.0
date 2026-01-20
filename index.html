@@ -45,7 +45,9 @@
 <body class="bg-slate-50 text-slate-900 bg-pattern">
     <div id="root"></div>
     
-    <!-- We mount here to ensure Babel processes the TSX imports correctly -->
+    <!-- We mount here to ensure Babel processes the TSX imports correctly. 
+         Note: We use data-plugins="transform-modules-umd" for better browser compatibility if needed, 
+         but standard Babel module support is usually enough. -->
     <script type="text/babel" data-type="module">
       import React from 'react';
       import { createRoot } from 'react-dom/client';
