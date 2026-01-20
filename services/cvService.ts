@@ -1,15 +1,23 @@
 
 export const downloadCV = async () => {
-  // The jspdf CDN script puts the library in window.jspdf.jsPDF
-  const jspdfModule = (window as any).jspdf;
+  // The jspdf CDN script puts the library in window.jspdf
+  const jspdfNamespace = (window as any).jspdf;
   
-  if (!jspdfModule || !jspdfModule.jsPDF) {
-    console.error("jsPDF library not fully loaded");
-    alert("The PDF generator is still loading. Please try again in a moment.");
+  if (!jspdfNamespace) {
+    console.error("jsPDF library not found in window object");
+    alert("The PDF generator is still loading or failed to load. Please check your internet connection.");
     return;
   }
 
-  const { jsPDF } = jspdfModule;
+  // In some versions it's window.jspdf.jsPDF, in others just window.jspdf
+  const jsPDF = jspdfNamespace.jsPDF || jspdfNamespace;
+  
+  if (typeof jsPDF !== 'function') {
+    console.error("jsPDF is not a constructor", jsPDF);
+    alert("PDF generation error. Please try again later.");
+    return;
+  }
+
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -20,13 +28,6 @@ export const downloadCV = async () => {
   const pageWidth = doc.internal.pageSize.getWidth();
   const maxWidth = pageWidth - (margin * 2);
   let y = margin;
-
-  const checkPage = (needed: number) => {
-    if (y + needed > 280) {
-      doc.addPage();
-      y = margin;
-    }
-  };
 
   // --- Content Generation ---
   doc.setFont('helvetica', 'bold');
@@ -80,7 +81,7 @@ export const downloadCV = async () => {
   doc.text('Six Eleven Global Services', margin, y);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
-  doc.text('03/2024 – 01/2026', pageWidth - margin - 30, y);
+  doc.text('03/2024 – 01/2026', pageWidth - margin - 35, y);
   y += 5;
   doc.setFont('helvetica', 'italic');
   doc.text('Customer Service Representative / RTA', margin, y);

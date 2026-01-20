@@ -1,9 +1,19 @@
 
 import React, { useState } from 'react';
-import { downloadCV } from '../services/cvService';
+import { downloadCV } from '../services/cvService.ts';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleDownload = async () => {
+    setIsDownloading(true);
+    try {
+      await downloadCV();
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   const navItems = [
     { label: 'Summary', href: '#summary' },
@@ -37,11 +47,16 @@ const Header: React.FC = () => {
               </a>
             ))}
             <button 
-              onClick={downloadCV}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all shadow-sm flex items-center gap-2"
+              onClick={handleDownload}
+              disabled={isDownloading}
+              className={`${isDownloading ? 'bg-blue-400 cursor-wait' : 'bg-blue-600 hover:bg-blue-700'} text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all shadow-sm flex items-center gap-2`}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-              Download CV
+              {isDownloading ? (
+                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+              )}
+              {isDownloading ? 'Generating...' : 'Download CV'}
             </button>
           </nav>
 
@@ -69,12 +84,13 @@ const Header: React.FC = () => {
           ))}
           <button 
             onClick={() => {
-              downloadCV();
+              handleDownload();
               setIsMenuOpen(false);
             }}
-            className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold"
+            disabled={isDownloading}
+            className={`w-full ${isDownloading ? 'bg-blue-400' : 'bg-blue-600'} text-white px-4 py-3 rounded-lg font-semibold`}
           >
-            Download CV
+            {isDownloading ? 'Generating...' : 'Download CV'}
           </button>
         </div>
       )}

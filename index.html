@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Use the full UMD bundle for jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <!-- Babel standalone for in-browser JSX/TS transformation -->
@@ -43,7 +45,20 @@
 </head>
 <body class="bg-slate-50 text-slate-900 bg-pattern">
     <div id="root"></div>
-    <!-- Load index.tsx using Babel and treating it as a module -->
-    <script type="text/babel" data-type="module" src="index.tsx"></script>
+    <script type="text/babel" data-type="module">
+      import React from 'react';
+      import ReactDOM from 'react-dom/client';
+      import App from './App.tsx';
+
+      const container = document.getElementById('root');
+      if (container) {
+        const root = ReactDOM.createRoot(container);
+        root.render(
+          <React.StrictMode>
+            <App />
+          </React.StrictMode>
+        );
+      }
+    </script>
 </body>
 </html>
