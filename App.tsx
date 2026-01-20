@@ -1,14 +1,14 @@
 
-import React, { useState, useEffect } from 'react';
-import Header from './components/Header';
-import Summary from './components/Summary';
-import Experience from './components/Experience';
-import Projects from './components/Projects';
-import Education from './components/Education';
-import Contact from './components/Contact';
-import Footer from './components/Footer';
-import ProjectModal from './components/ProjectModal';
-import { Project } from './types';
+import React, { useState } from 'react';
+import Header from './components/Header.tsx';
+import Summary from './components/Summary.tsx';
+import Experience from './components/Experience.tsx';
+import Projects from './components/Projects.tsx';
+import Education from './components/Education.tsx';
+import Contact from './components/Contact.tsx';
+import Footer from './components/Footer.tsx';
+import ProjectModal from './components/ProjectModal.tsx';
+import { Project } from './types.ts';
 
 const App: React.FC = () => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
