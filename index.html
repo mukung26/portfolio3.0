@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Portfolio Version: 1.0.8 - Added Version Indicator -->
+<!-- Portfolio Version: 1.1.2 - Force Update -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -61,6 +61,7 @@
 
       // --- CV Service ---
       const downloadCV = async () => {
+        console.log("Starting CV generation v1.1.2...");
         try {
           if (!window.jspdf) {
             alert("PDF library is still loading. Please check your internet connection and try again.");
@@ -481,7 +482,7 @@
 
             <footer className="max-w-5xl mx-auto px-4 mt-32 text-center text-slate-400 text-sm font-bold border-t border-slate-100 dark:border-slate-900 pt-12 pb-12">
               <p>© {new Date().getFullYear()} Jerwin Cruspero</p>
-              <p className="text-[10px] mt-2 opacity-50">v1.1.0 - CV Fixed</p>
+              <p className="text-[10px] mt-2 opacity-50">v1.1.2 - Deployment Fixed</p>
             </footer>
 
             {/* Project Modal */}
