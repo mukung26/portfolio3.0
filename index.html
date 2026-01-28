@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Portfolio Version: 1.0.3 - Adding PDF Link -->
+<!-- Portfolio Version: 1.0.6 - Custom Websites & Web Dev Skills -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jerwin Cruspero | Accounts Payable Specialist • Customer Service & Automation</title>
+    <title>Jerwin Cruspero | Web Developer • Accounts Payable • Customer Service</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -80,7 +80,7 @@
           pdf.setFontSize(10);
           pdf.setFont('helvetica', 'bold');
           pdf.setTextColor(60, 60, 60);
-          pdf.text('Accounts Payable Specialist \u2022 Customer Service & Automation', margin, y);
+          pdf.text('Website Developer \u2022 Accounts Payable Specialist \u2022 Customer Service', margin, y);
           y += 5;
 
           // Header - Contact Info
@@ -92,7 +92,7 @@
           y += 5;
 
           // Portfolio Link in PDF
-          const portfolioUrl = 'https://mukung26.github.io/portfolio3.0/';
+          const portfolioUrl = 'https://mukung26.github.io/OnlinePortfolio/';
           pdf.setTextColor(11, 95, 255);
           pdf.text('Portfolio: ' + portfolioUrl, margin, y);
           pdf.link(margin, y - 3, pdf.getTextWidth('Portfolio: ' + portfolioUrl), 4, { url: portfolioUrl });
@@ -114,7 +114,7 @@
           pdf.setTextColor(0, 0, 0);
           pdf.setFont('helvetica', 'normal');
           pdf.setFontSize(8.5);
-          const summaryText = 'Customer Service professional with hands-on automation experience and foundational accounting knowledge. I build tools and workflows that reduce manual work, improve data accuracy, and make operational reporting reliable. Ready to transition into Accounts Payable with strong Excel, Google Workspace, and ERP learning aptitude.';
+          const summaryText = 'Professional Website Developer specializing in creating custom, personal, and business websites. I build secure, high-performance web tools using React, Tailwind CSS, and Cloudflare/Google database integrations. With a strong background in Customer Service and Admin Support, I ensure solutions are not only technical but also user-friendly and reliable.';
           const summaryLines = pdf.splitTextToSize(summaryText, maxWidth);
           pdf.text(summaryLines, margin, y);
           y += summaryLines.length * 4.5 + 6;
@@ -129,10 +129,11 @@
           pdf.setFont('helvetica', 'normal');
           
           const skillsList = [
-            'Communication, Problem Solving, Time Management, Teamwork',
-            'Excel & Pivot Tables, Google Workspace, Google Apps Script, Webhook Integration',
-            'Node.js \u2022 Java \u2022 Python, ERP Learning Aptitude, Data Entry & Reconciliation',
-            'Typing 90+ wpm'
+            'Custom Website Development (React, Tailwind CSS, HTML5, CSS3)',
+            'Secure Cloud Database Integration (Google Firebase, Cloudflare)',
+            'API Integration, Webhooks, Node.js & Google Apps Script',
+            'Communication, Problem Solving, & Team Collaboration',
+            'Excel, Pivot Tables, & Data Reconciliation'
           ];
           
           skillsList.forEach(line => {
@@ -149,7 +150,7 @@
           y += 6;
 
           // Experience 1
-          addCVExperience(pdf, 'Six Eleven Global Services', 'CSR / RTA \u2014 Davao | 03/2024 \u2013 01/2026', [
+          addCVExperience(pdf, 'Six Eleven Global Services', 'Customer Service Representative \u2014 Davao | 03/2024 \u2013 01/2026', [
             'Train new CSRs on order processing, credit handling, and escalation procedures; recognized as top performer with high QA scores.',
             'Primary contact for order entry and email inquiries; process customer orders while meeting SLAs.',
             'Support AP readiness: input invoices and credit notes, prepare data for vendor reconciliation.',
@@ -310,15 +311,15 @@
         }, []);
 
         const coreSkills = [
-          "Communication", "Problem Solving", "Time Management", "Teamwork",
-          "Excel & Pivot Tables", "Google Workspace", "Google Apps Script",
-          "Webhook Integration", "Node.js • Java • Python", "ERP Learning Aptitude",
-          "Data Entry & Reconciliation", "Typing 90+ wpm"
+          "Custom Websites", "React & Tailwind", "Secure Cloud DB",
+          "API Integration", "Google Apps Script", "Node.js",
+          "Automation", "Excel & Pivot Tables", "Communication",
+          "Problem Solving"
         ];
 
         const projects = [
           { id: 'p1', title: "Shift Attendance Automation", meta: "Google Apps Script • Sheets • Webhooks", icon: "📊", body: "Full implementation includes roster parsing, multi-span support, overnight shift handling, deduplication using PropertiesService, and scheduled triggers for fast reconciliation.", impact: "Reduced manual attendance entry by 90%, eliminated deduplication errors, and improved response time for reporting." },
-          { id: 'p2', title: "Webhook Receiver & Dashboard", meta: "Node.js • Express • Replit", icon: "🤖", body: "Production-ready webhook receiver that validates incoming requests, forwards events to Apps Script, and provides a simple web dashboard for real-time event inspection.", impact: "Enabled real-time integrations and reduced event debugging time from hours to minutes." },
+          { id: 'p2', title: "Bot UI & Webhook Dashboard", meta: "React • Node.js • Cloudflare • Replit", icon: "🤖", body: "A specialized website and dashboard designed for Bot UI integrations. Features real-time event inspection, payload validation, and seamless configuration of webhook listeners to streamline automation.", impact: "Enabled real-time integrations, reduced event debugging time from hours to minutes, and provided a user-friendly UI for operations." },
           { id: 'p3', title: "Operational Reporting Tools", meta: "Sheets • Apps Script • Pivot Tables", icon: "📈", body: "Automated reporting suite used to cross-check operational data against spreadsheets and support month-end reconciliations. Includes scheduled exports and pivot-driven summaries.", impact: "Reduced month-end close time by 40%, eliminated manual pivot table creation, and improved data accuracy." },
           { id: 'p4', title: "Alert Bot Integrations", meta: "Webhooks • API Integrations • Automation", icon: "🚨", body: "Webhook-driven alert system that automatically tags team members, routes incidents, and executes fallback workflows to improve response times and reduce manual intervention.", impact: "Reduced manual escalation steps from 5 to 1, cut average response time in half, and improved incident resolution." }
         ];
@@ -355,7 +356,7 @@
                     <h2 className="text-blue-600 font-extrabold uppercase tracking-widest text-xs mb-4">Professional Summary</h2>
                     <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white mb-6 leading-tight">Jerwin Cruspero</h1>
                     <p className="text-slate-600 dark:text-slate-400 text-lg leading-relaxed mb-8">
-                      Customer Service professional with hands-on automation experience and foundational accounting knowledge. I build tools and workflows that reduce manual work, improve data accuracy, and make operational reporting reliable. Ready to transition into Accounts Payable with strong Excel, Google Workspace, and ERP learning aptitude.
+                      I create <strong>personal and custom websites</strong> designed for performance and reliability. Specializing in secure web tools using React, Tailwind CSS, and Cloudflare/Google database integrations, I help businesses automate workflows and improve data accuracy. With a background in Customer Service and Admin Support, I ensure every project is user-friendly and meets your specific needs.
                     </p>
                     <div className="grid sm:grid-cols-2 gap-4 text-sm font-medium text-slate-500 dark:text-slate-400 mb-8">
                       <div><strong>Email:</strong> jcruspero3263@gmail.com</div>
@@ -377,7 +378,12 @@
 
               {/* Projects Section */}
               <section id="projects">
-                <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-10">Projects & Achievements</h2>
+                <div className="flex flex-col sm:flex-row justify-between items-end mb-10 gap-4">
+                    <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white">Projects & Achievements</h2>
+                    <a href="https://github.com/mukung26?tab=repositories" target="_blank" rel="noopener noreferrer" className="text-blue-600 font-bold text-sm hover:underline flex items-center gap-1 group">
+                        View more repositories <span className="group-hover:translate-x-1 transition-transform">→</span>
+                    </a>
+                </div>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {projects.map(p => (
                     <div key={p.id} onClick={() => setSelectedProject(p)} className="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-800 hover:border-blue-400 transition-all cursor-pointer group shadow-sm flex flex-col h-full">
@@ -399,7 +405,7 @@
                     <div className="flex flex-col md:flex-row md:justify-between items-start mb-4">
                       <div>
                         <h3 className="font-extrabold text-2xl text-slate-900 dark:text-white">Six Eleven Global Services</h3>
-                        <p className="text-blue-600 font-bold">CSR / RTA — Davao | 03/2024 – 01/2026</p>
+                        <p className="text-blue-600 font-bold">Customer Service Representative — Davao | 03/2024 – 01/2026</p>
                       </div>
                     </div>
                     <ul className="text-slate-600 dark:text-slate-400 space-y-4 text-base list-disc pl-5">
