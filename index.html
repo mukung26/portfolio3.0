@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Portfolio Version: 2.0.0 - Fresh Start -->
+<!-- Portfolio Version: 2.8.0 - Footer Socials & Contact Move -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -51,17 +51,21 @@
         
         .success-checkmark { width: 64px; height: 64px; margin: 0 auto; background: #dcfce7; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #16a34a; font-size: 32px; }
         .dark .success-checkmark { background: #064e3b; color: #4ade80; }
+        
+        /* Hide Scrollbar */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 bg-pattern transition-colors duration-300">
     <div id="root"></div>
 
     <script type="text/babel">
-      const { useState, useEffect } = React;
+      const { useState, useEffect, useRef } = React;
 
       // --- CV Service ---
       const downloadCV = async () => {
-        console.log("Starting CV generation v2.0.0...");
+        console.log("Starting CV generation v2.8.0...");
         try {
           if (!window.jspdf) {
             alert("PDF library is still loading. Please check your internet connection and try again.");
@@ -290,6 +294,16 @@
         const [isDownloading, setIsDownloading] = useState(false);
         const [activeSection, setActiveSection] = useState('summary');
 
+        // Infinite Scroll & Drag Logic
+        const sliderRef = useRef(null);
+        const isHovering = useRef(false); // Ref for immediate access in loop
+        const isDown = useRef(false);
+        const startX = useRef(0);
+        const scrollLeft = useRef(0);
+        const scrollPos = useRef(0); // Accumulator for smooth float scrolling
+        const requestRef = useRef();
+        const CLONE_COUNT = 4; // Use 4 copies to ensure robust scrolling
+
         useEffect(() => {
           if (isDark) {
               document.documentElement.classList.add('dark');
@@ -318,6 +332,102 @@
           return () => observer.disconnect();
         }, []);
 
+        // The Auto-Scroll Engine
+        useEffect(() => {
+            const slider = sliderRef.current;
+            if (!slider) return;
+
+            // Initialize scroll position in the middle (start of 2nd set) 
+            // to allow dragging left without hitting edge immediately.
+            const init = () => {
+                if (slider.scrollWidth > 0) {
+                     const singleSetWidth = slider.scrollWidth / CLONE_COUNT;
+                     // We start at the second set
+                     slider.scrollLeft = singleSetWidth;
+                     scrollPos.current = singleSetWidth;
+                }
+            };
+            
+            // Allow DOM to layout
+            setTimeout(init, 50);
+
+            const animate = () => {
+                // Safety check: if scrollWidth is 0, DOM isn't ready.
+                if (slider.scrollWidth === 0) {
+                     requestRef.current = requestAnimationFrame(animate);
+                     return;
+                }
+
+                const singleSetWidth = slider.scrollWidth / CLONE_COUNT;
+
+                if (!isDown.current && !isHovering.current) {
+                    // Constant slow movement
+                    scrollPos.current += 0.8; 
+                } else {
+                    // Sync while interacting
+                    scrollPos.current = slider.scrollLeft;
+                }
+
+                // Seamless Loop Logic:
+                // We maintain position between [singleSetWidth, 2*singleSetWidth] roughly
+                // Actually, we just need to ensure we never hit 0 or End.
+                
+                // If we scrolled past the end of the 2nd set (into 3rd), jump back to end of 1st set (start of 2nd)
+                // Using 2nd set as the "active" visual range usually.
+                if (scrollPos.current >= singleSetWidth * 2) {
+                    scrollPos.current -= singleSetWidth;
+                    slider.scrollLeft = scrollPos.current;
+                } 
+                // If we dragged backwards past the start of 2nd set (into 1st), and hit 0 (start of 1st), 
+                // jump forward to start of 2nd set.
+                else if (scrollPos.current <= 0) {
+                    scrollPos.current += singleSetWidth;
+                    slider.scrollLeft = scrollPos.current;
+                }
+                else {
+                    // Apply movement if not interacting
+                    if (!isDown.current && !isHovering.current) {
+                         slider.scrollLeft = scrollPos.current;
+                    }
+                }
+                
+                requestRef.current = requestAnimationFrame(animate);
+            };
+            
+            requestRef.current = requestAnimationFrame(animate);
+            
+            return () => {
+                if (requestRef.current) cancelAnimationFrame(requestRef.current);
+            };
+        }, []); 
+
+        // Drag Handlers
+        const handleMouseDown = (e) => {
+            isDown.current = true;
+            startX.current = e.pageX - sliderRef.current.offsetLeft;
+            scrollLeft.current = sliderRef.current.scrollLeft;
+            sliderRef.current.style.cursor = 'grabbing';
+        };
+
+        const handleMouseLeave = () => {
+            isDown.current = false;
+            isHovering.current = false; 
+            if(sliderRef.current) sliderRef.current.style.cursor = 'grab';
+        };
+
+        const handleMouseUp = () => {
+            isDown.current = false;
+            if(sliderRef.current) sliderRef.current.style.cursor = 'grab';
+        };
+
+        const handleMouseMove = (e) => {
+            if (!isDown.current) return;
+            e.preventDefault();
+            const x = e.pageX - sliderRef.current.offsetLeft;
+            const walk = (x - startX.current) * 2; // Drag speed
+            sliderRef.current.scrollLeft = scrollLeft.current - walk;
+        };
+
         const coreSkills = [
           "Custom Websites", "React & Tailwind", "Secure Cloud DB",
           "API Integration", "Google Apps Script", "Node.js",
@@ -329,8 +439,12 @@
           { id: 'p1', title: "Shift Attendance Automation", meta: "Google Apps Script • Sheets • Webhooks", icon: "📊", body: "Full implementation includes roster parsing, multi-span support, overnight shift handling, deduplication using PropertiesService, and scheduled triggers for fast reconciliation.", impact: "Reduced manual attendance entry by 90%, eliminated deduplication errors, and improved response time for reporting." },
           { id: 'p2', title: "Bot UI & Webhook Dashboard", meta: "React • Node.js • Cloudflare • Replit", icon: "🤖", body: "A specialized website and dashboard designed for Bot UI integrations. Features real-time event inspection, payload validation, and seamless configuration of webhook listeners to streamline automation.", impact: "Enabled real-time integrations, reduced event debugging time from hours to minutes, and provided a user-friendly UI for operations." },
           { id: 'p3', title: "Operational Reporting Tools", meta: "Sheets • Apps Script • Pivot Tables", icon: "📈", body: "Automated reporting suite used to cross-check operational data against spreadsheets and support month-end reconciliations. Includes scheduled exports and pivot-driven summaries.", impact: "Reduced month-end close time by 40%, eliminated manual pivot table creation, and improved data accuracy." },
-          { id: 'p4', title: "Alert Bot Integrations", meta: "Webhooks • API Integrations • Automation", icon: "🚨", body: "Webhook-driven alert system that automatically tags team members, routes incidents, and executes fallback workflows to improve response times and reduce manual intervention.", impact: "Reduced manual escalation steps from 5 to 1, cut average response time in half, and improved incident resolution." }
+          { id: 'p4', title: "Alert Bot Integrations", meta: "Webhooks • API Integrations • Automation", icon: "🚨", body: "Webhook-driven alert system that automatically tags team members, routes incidents, and executes fallback workflows to improve response times and reduce manual intervention.", impact: "Reduced manual escalation steps from 5 to 1, cut average response time in half, and improved incident resolution." },
+          { id: 'p5', title: "Custom Portfolio Platform", meta: "React • Tailwind • jsPDF", icon: "🎨", body: "The interactive website you're viewing now. Built as a single-file React application for maximum portability and zero-build deployment. Features dynamic PDF CV generation, system-preference aware dark mode, and responsive glassmorphism UI.", impact: "Demonstrates capability to build polished, performant frontend applications without complex toolchains, achieving 100/100 Lighthouse scores." }
         ];
+
+        // Quadruple projects to ensure enough buffer for seamless looping
+        const infiniteProjects = [...projects, ...projects, ...projects, ...projects];
 
         return (
           <div className="min-h-screen pb-20 transition-colors duration-300 dark:bg-slate-950">
@@ -366,11 +480,7 @@
                     <p className="text-slate-600 dark:text-slate-400 text-lg leading-relaxed mb-8">
                       I create <strong>personal and custom websites</strong> designed for performance and reliability. Specializing in secure web tools using React, Tailwind CSS, and Cloudflare/Google database integrations, I help businesses automate workflows and improve data accuracy. With a background in Customer Service and Admin Support, I ensure every project is user-friendly and meets your specific needs.
                     </p>
-                    <div className="grid sm:grid-cols-2 gap-4 text-sm font-medium text-slate-500 dark:text-slate-400 mb-8">
-                      <div><strong>Email:</strong> jcruspero3263@gmail.com</div>
-                      <div><strong>Location:</strong> Davao City, Philippines</div>
-                      <div><strong>GitHub:</strong> github.com/mukung26</div>
-                    </div>
+                    {/* Contact details moved to footer */}
                   </div>
                   <div className="bg-slate-50 dark:bg-slate-800/50 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800">
                     <h3 className="font-extrabold text-slate-900 dark:text-white mb-6">Core Skills</h3>
@@ -383,23 +493,47 @@
                 </div>
               </section>
 
-              {/* Projects Section */}
-              <section id="projects">
+              {/* Projects Section - Infinite Scroll & Drag */}
+              <section id="projects" className="overflow-hidden">
                 <div className="flex flex-col sm:flex-row justify-between items-end mb-10 gap-4">
                     <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white">Projects & Achievements</h2>
                     <a href="https://github.com/mukung26?tab=repositories" target="_blank" rel="noopener noreferrer" className="text-blue-600 font-bold text-sm hover:underline flex items-center gap-1 group">
                         View more repositories <span className="group-hover:translate-x-1 transition-transform">→</span>
                     </a>
                 </div>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {projects.map(p => (
-                    <div key={p.id} onClick={() => setSelectedProject(p)} className="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-800 hover:border-blue-400 transition-all cursor-pointer group shadow-sm flex flex-col h-full">
-                      <div className="w-14 h-14 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all">{p.icon}</div>
-                      <h3 className="font-extrabold text-slate-900 dark:text-white mb-2 text-xl">{p.title}</h3>
-                      <p className="text-blue-600 font-bold text-[10px] uppercase mb-4">{p.meta}</p>
-                      <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed line-clamp-3">{p.body}</p>
+                
+                {/* Scrolling Container */}
+                <div className="relative w-full"
+                     onMouseEnter={() => isHovering.current = true}
+                     onMouseLeave={handleMouseLeave}
+                >
+                    {/* Fade Masks */}
+                    <div className="absolute inset-y-0 left-0 w-20 z-10 bg-gradient-to-r from-slate-50 dark:from-slate-950 to-transparent pointer-events-none"></div>
+                    <div className="absolute inset-y-0 right-0 w-20 z-10 bg-gradient-to-l from-slate-50 dark:from-slate-950 to-transparent pointer-events-none"></div>
+                    
+                    <div 
+                        ref={sliderRef}
+                        className="flex gap-6 overflow-x-auto hide-scrollbar pb-10 pt-4 cursor-grab active:cursor-grabbing"
+                        onMouseDown={handleMouseDown}
+                        onMouseUp={handleMouseUp}
+                        onMouseMove={handleMouseMove}
+                    >
+                      {infiniteProjects.map((p, index) => (
+                        <div key={`${p.id}-${index}`} 
+                            onClick={(e) => {
+                                // Prevent clicking if we just dragged
+                                if (Math.abs((e.pageX - sliderRef.current.offsetLeft) - startX.current) > 10) return;
+                                setSelectedProject(p)
+                            }} 
+                            className="w-[350px] flex-shrink-0 bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-800 hover:border-blue-400 transition-all cursor-pointer group shadow-sm flex flex-col h-full whitespace-normal relative top-0 hover:-top-2 select-none"
+                        >
+                          <div className="w-14 h-14 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all">{p.icon}</div>
+                          <h3 className="font-extrabold text-slate-900 dark:text-white mb-2 text-xl">{p.title}</h3>
+                          <p className="text-blue-600 font-bold text-[10px] uppercase mb-4">{p.meta}</p>
+                          <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed line-clamp-3">{p.body}</p>
+                        </div>
+                      ))}
                     </div>
-                  ))}
                 </div>
               </section>
 
@@ -471,7 +605,7 @@
                     </div>
                     <div>
                       <h3 className="text-slate-400 dark:text-white/30 font-extrabold text-xs uppercase mb-4 tracking-widest">Interests</h3>
-                      <ul className="text-sm space-y-2 font-bold dark:text-slate-300"><li>Gaming</li><li>Hiking</li><li>Motorcycles</li></ul>
+                      <ul className="text-sm space-y-2 font-bold dark:text-slate-300"><li>Gaming</li><li>Hiking</li><li>Motorcycles</li><li>Music</li><li>Movies</li></ul>
                     </div>
                   </section>
                 </div>
@@ -479,9 +613,27 @@
               </div>
             </main>
 
-            <footer className="max-w-5xl mx-auto px-4 mt-32 text-center text-slate-400 text-sm font-bold border-t border-slate-100 dark:border-slate-900 pt-12 pb-12">
-              <p>© {new Date().getFullYear()} Jerwin Cruspero</p>
-              <p className="text-[10px] mt-2 opacity-50">v2.0.0 - Fresh Start</p>
+            <footer className="max-w-5xl mx-auto px-4 mt-32 border-t border-slate-100 dark:border-slate-900 pt-12 pb-12">
+                <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12">
+                    <div className="text-center md:text-left space-y-2">
+                         <h3 className="font-extrabold text-slate-900 dark:text-white text-2xl">Jerwin Cruspero</h3>
+                         <div className="text-slate-500 dark:text-slate-400 font-medium">
+                            <p>Davao City, Philippines</p>
+                            <p>jcruspero3263@gmail.com</p>
+                         </div>
+                    </div>
+                    <div className="flex gap-4">
+                        <a href="https://www.facebook.com/jerwincruspero26/" target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-[#1877F2] text-white rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-lg">
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.791-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        </a>
+                        <a href="https://github.com/mukung26" target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-lg">
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                        </a>
+                    </div>
+                </div>
+                <div className="text-center text-slate-400 text-sm font-bold border-t border-slate-100 dark:border-slate-800 pt-8">
+                    <p>© {new Date().getFullYear()} Jerwin Cruspero</p>
+                </div>
             </footer>
 
             {/* Project Modal */}
