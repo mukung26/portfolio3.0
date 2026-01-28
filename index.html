@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Portfolio Version: 2.8.0 - Footer Socials & Contact Move -->
+<!-- Portfolio Version: 2.9.0 - Smooth Scroll Fix & Socials -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -65,7 +65,7 @@
 
       // --- CV Service ---
       const downloadCV = async () => {
-        console.log("Starting CV generation v2.8.0...");
+        console.log("Starting CV generation v2.9.0...");
         try {
           if (!window.jspdf) {
             alert("PDF library is still loading. Please check your internet connection and try again.");
@@ -97,6 +97,7 @@
           pdf.setFontSize(8.5);
           pdf.setFont('helvetica', 'normal');
           pdf.setTextColor(100, 100, 100);
+          // Removed phone number
           const contactInfo = 'Davao City, Philippines  |  Email: jcruspero3263@gmail.com';
           pdf.text(contactInfo, margin, y);
           y += 5;
@@ -296,13 +297,13 @@
 
         // Infinite Scroll & Drag Logic
         const sliderRef = useRef(null);
-        const isHovering = useRef(false); // Ref for immediate access in loop
+        const isHovering = useRef(false); 
         const isDown = useRef(false);
         const startX = useRef(0);
         const scrollLeft = useRef(0);
-        const scrollPos = useRef(0); // Accumulator for smooth float scrolling
+        const scrollPos = useRef(0); 
         const requestRef = useRef();
-        const CLONE_COUNT = 4; // Use 4 copies to ensure robust scrolling
+        const CLONE_COUNT = 4;
 
         useEffect(() => {
           if (isDark) {
@@ -332,73 +333,75 @@
           return () => observer.disconnect();
         }, []);
 
-        // The Auto-Scroll Engine
+        // The Auto-Scroll Engine (Optimized for smoothness)
         useEffect(() => {
             const slider = sliderRef.current;
             if (!slider) return;
 
-            // Initialize scroll position in the middle (start of 2nd set) 
-            // to allow dragging left without hitting edge immediately.
-            const init = () => {
-                if (slider.scrollWidth > 0) {
-                     const singleSetWidth = slider.scrollWidth / CLONE_COUNT;
-                     // We start at the second set
-                     slider.scrollLeft = singleSetWidth;
-                     scrollPos.current = singleSetWidth;
-                }
-            };
-            
-            // Allow DOM to layout
-            setTimeout(init, 50);
+            let lastTime = 0;
+            const speed = 40; // Pixels per second
 
-            const animate = () => {
-                // Safety check: if scrollWidth is 0, DOM isn't ready.
-                if (slider.scrollWidth === 0) {
+            const animate = (time) => {
+                if (!lastTime) lastTime = time;
+                const delta = (time - lastTime) / 1000;
+                lastTime = time;
+
+                if (!slider.children || slider.children.length === 0) {
                      requestRef.current = requestAnimationFrame(animate);
                      return;
                 }
 
-                const singleSetWidth = slider.scrollWidth / CLONE_COUNT;
+                // Dynamic Width Calculation for perfect looping
+                const cardsPerSet = projects.length; // 5
+                if (slider.children.length < cardsPerSet * 2) {
+                     requestRef.current = requestAnimationFrame(animate);
+                     return;
+                }
 
+                const firstCard = slider.children[0];
+                const firstCardSet2 = slider.children[cardsPerSet];
+                // Distance from start of item 0 to start of item 5 (which is item 0 of set 2)
+                const singleSetWidth = firstCardSet2.offsetLeft - firstCard.offsetLeft;
+
+                // 1. Update ScrollPos based on mode
                 if (!isDown.current && !isHovering.current) {
-                    // Constant slow movement
-                    scrollPos.current += 0.8; 
+                    scrollPos.current += speed * delta;
                 } else {
-                    // Sync while interacting
                     scrollPos.current = slider.scrollLeft;
                 }
 
-                // Seamless Loop Logic:
-                // We maintain position between [singleSetWidth, 2*singleSetWidth] roughly
-                // Actually, we just need to ensure we never hit 0 or End.
-                
-                // If we scrolled past the end of the 2nd set (into 3rd), jump back to end of 1st set (start of 2nd)
-                // Using 2nd set as the "active" visual range usually.
+                // 2. Check Loop Bounds
+                // We ensure scrollPos is within a safe range to prevent running out of clones
                 if (scrollPos.current >= singleSetWidth * 2) {
                     scrollPos.current -= singleSetWidth;
-                    slider.scrollLeft = scrollPos.current;
-                } 
-                // If we dragged backwards past the start of 2nd set (into 1st), and hit 0 (start of 1st), 
-                // jump forward to start of 2nd set.
-                else if (scrollPos.current <= 0) {
+                    slider.scrollLeft = scrollPos.current; // seamless jump
+                } else if (scrollPos.current <= 0) {
                     scrollPos.current += singleSetWidth;
-                    slider.scrollLeft = scrollPos.current;
-                }
-                else {
-                    // Apply movement if not interacting
+                    slider.scrollLeft = scrollPos.current; // seamless jump
+                } else {
+                    // 3. Apply normal movement (only if auto-scrolling)
                     if (!isDown.current && !isHovering.current) {
-                         slider.scrollLeft = scrollPos.current;
+                        slider.scrollLeft = scrollPos.current;
                     }
                 }
                 
                 requestRef.current = requestAnimationFrame(animate);
             };
             
+            // Initial positioning
+            setTimeout(() => {
+                 if (slider.children.length > projects.length) {
+                    const firstCard = slider.children[0];
+                    const firstCardSet2 = slider.children[projects.length];
+                    const singleSetWidth = firstCardSet2.offsetLeft - firstCard.offsetLeft;
+                    slider.scrollLeft = singleSetWidth;
+                    scrollPos.current = singleSetWidth;
+                 }
+            }, 100);
+
             requestRef.current = requestAnimationFrame(animate);
             
-            return () => {
-                if (requestRef.current) cancelAnimationFrame(requestRef.current);
-            };
+            return () => cancelAnimationFrame(requestRef.current);
         }, []); 
 
         // Drag Handlers
@@ -517,6 +520,7 @@
                         onMouseDown={handleMouseDown}
                         onMouseUp={handleMouseUp}
                         onMouseMove={handleMouseMove}
+                        style={{ scrollBehavior: 'auto' }} /* Critical for JS loop smoothness */
                     >
                       {infiniteProjects.map((p, index) => (
                         <div key={`${p.id}-${index}`} 
