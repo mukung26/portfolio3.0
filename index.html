@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Portfolio Version: 1.0.6 - Custom Websites & Web Dev Skills -->
+<!-- Portfolio Version: 1.0.7 - Fixed CV Generation & Dynamic Layout -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -62,6 +62,11 @@
       // --- CV Service ---
       const downloadCV = async () => {
         try {
+          if (!window.jspdf) {
+            alert("PDF library is still loading. Please check your internet connection and try again.");
+            return;
+          }
+
           const { jsPDF } = window.jspdf;
           const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
           const pageWidth = pdf.internal.pageSize.getWidth();
@@ -91,14 +96,14 @@
           pdf.text(contactInfo, margin, y);
           y += 5;
 
-          // Portfolio Link in PDF
+          // Portfolio Link
           const portfolioUrl = 'https://mukung26.github.io/OnlinePortfolio/';
           pdf.setTextColor(11, 95, 255);
           pdf.text('Portfolio: ' + portfolioUrl, margin, y);
           pdf.link(margin, y - 3, pdf.getTextWidth('Portfolio: ' + portfolioUrl), 4, { url: portfolioUrl });
           y += 6;
 
-          // Horizontal Divider
+          // Divider
           pdf.setDrawColor(11, 95, 255);
           pdf.setLineWidth(0.5);
           pdf.line(margin, y, pageWidth - margin, y);
@@ -122,6 +127,7 @@
           // Core Skills
           pdf.setTextColor(11, 95, 255);
           pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(10);
           pdf.text('CORE SKILLS', margin, y);
           y += 5;
           pdf.setTextColor(0, 0, 0);
@@ -140,7 +146,7 @@
             pdf.text('\u2022 ' + line, margin + 2, y);
             y += 4.5;
           });
-          y += 4;
+          y += 6;
 
           // Experience Section
           pdf.setTextColor(11, 95, 255);
@@ -150,21 +156,21 @@
           y += 6;
 
           // Experience 1
-          addCVExperience(pdf, 'Six Eleven Global Services', 'Customer Service Representative \u2014 Davao | 03/2024 \u2013 01/2026', [
+          y = addCVExperience(pdf, 'Six Eleven Global Services', 'Customer Service Representative \u2014 Davao | 03/2024 \u2013 01/2026', [
             'Train new CSRs on order processing, credit handling, and escalation procedures; recognized as top performer with high QA scores.',
             'Primary contact for order entry and email inquiries; process customer orders while meeting SLAs.',
             'Support AP readiness: input invoices and credit notes, prepare data for vendor reconciliation.',
             'Prepare spreadsheets using formulas and pivot tables for month-end checks and GL allocations.'
           ], margin, y);
-          y += 36;
+          y += 5; // Spacing between jobs
 
           // Experience 2
-          addCVExperience(pdf, 'Tempestas ESports', 'Administrative Support \u2014 Davao | 12/2020 \u2013 12/2022', [
+          y = addCVExperience(pdf, 'Tempestas ESports', 'Administrative Support \u2014 Davao | 12/2020 \u2013 12/2022', [
             'Managed administrative workflows and internal spreadsheets supporting month-end tasks.',
             'Streamlined booking and reporting processes, improving data accuracy and reducing admin time.',
             'Provided chat and email support for customer inquiries and order coordination.'
           ], margin, y);
-          y += 28;
+          y += 8; // Spacing before Education
 
           // Education & Training
           pdf.setTextColor(11, 95, 255);
@@ -188,8 +194,8 @@
 
           pdf.save('Jerwin_Cruspero_CV.pdf');
         } catch (e) {
-          console.error(e);
-          alert("Error generating CV. Please try again.");
+          console.error("CV Generation Error:", e);
+          alert("Error generating CV. Please check the console for details.");
         }
       };
 
@@ -213,6 +219,7 @@
               pdf.text(lines, margin + 2, bulletY);
               bulletY += lines.length * 4.5;
           });
+          return bulletY; // Return the new Y position
       }
 
       // --- Contact Form ---

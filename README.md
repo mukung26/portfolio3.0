@@ -11,7 +11,7 @@ This portfolio is built with React and Tailwind CSS, using native ES modules.
    git init
    git add .
    git commit -m "Initial commit"
-   git remote add origin https://github.com/your-username/your-repo.git
+   git remote add origin https://github.com/mukung26/OnlinePortfolio.git
    git push -u origin main
    ```
 3. **Enable GitHub Pages**:
